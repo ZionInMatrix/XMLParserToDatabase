@@ -30,31 +30,12 @@ import java.util.List;
 
 public class XMLConsume {
     static final String url = "https://vdp.cuzk.cz/vymenny_format/soucasna/20211031_OB_573060_UZSZ.xml.zip";
-    static final String pathToDownloadFile = System.getProperty("user.dir") + "/src/main/addressBook.zip";
-    static final String pathToUnzipFile = System.getProperty("user.dir") + "/src/main/resource";
+    static final String pathToDownloadFile = System.getProperty("user.dir") + "/src/main/resources/addressBook.zip";
+    static final String pathToUnzipFile = System.getProperty("user.dir") + "/src/main/resources";
 
     public static void main(String[] args) throws Exception {
         downloadAndUnzip();
         parseData();
-
-    }
-
-    /**
-     * The method will allow parse data to database
-     *
-     * @throws Exception if something goes wrong
-     */
-    public static void parseData() throws Exception {
-        File file = new File(System.getProperty("user.dir") + "/src/main/resource/20211031_OB_573060_UZSZ.xml");
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document xmlDoc = builder.parse(file);
-
-        XPath xpath = XPathFactory.newInstance().newXPath();
-
-        Node res = (Node) xpath.evaluate("/vf:Data/vf:Obce", xmlDoc, XPathConstants.NODESET);
-
-        getTextContent(res, "vf:Obec");
 
     }
 
@@ -123,6 +104,25 @@ public class XMLConsume {
         connection.setAutoCommit(false);
 
         return connection;
+    }
+
+    /**
+     * The method will allow parse data to database
+     *
+     * @throws Exception if something goes wrong
+     */
+    public static void parseData() throws Exception {
+        File file = new File(System.getProperty("user.dir") + "/src/main/resources/20211031_OB_573060_UZSZ.xml");
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document xmlDoc = builder.parse(file);
+
+        XPath xpath = XPathFactory.newInstance().newXPath();
+
+        NodeList res = (NodeList) xpath.evaluate("/vf:Data/vf:Obce", xmlDoc, XPathConstants.NODESET);
+
+        getTextContent((Node) res, "vf:Obce");
+
     }
 
     /**
