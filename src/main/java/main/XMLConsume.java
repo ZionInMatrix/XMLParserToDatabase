@@ -33,54 +33,18 @@ public class XMLConsume {
     static final String pathToDownloadFile = System.getProperty("user.dir") + "/src/main/addressBook.zip";
     static final String pathToUnzipFile = System.getProperty("user.dir") + "/src/main/resource";
 
-    static private String getAttrValue(Node node, String attrName) {
-        if (!node.hasAttributes()) {
-            return "";
-        }
-
-        NamedNodeMap nmap = node.getAttributes();
-        if (nmap == null) {
-            return "";
-        }
-
-        Node n = nmap.getNamedItem(attrName);
-        if (n == null) {
-            return "";
-        }
-        return n.getNodeValue();
-    }
-
-    static private String getTextContent(Node parentNode, String childName) throws SQLException {
-        NodeList nList = parentNode.getChildNodes();
-        Connection connection = connectToDatabase();
-
-        String sql = "insert into obec(kod, nazev) values(?,?)";
-
-        PreparedStatement stmt = connection.prepareStatement(sql);
-
-        for (int i = 0; i < nList.getLength(); i++) {
-            Node n = nList.item(i);
-            String name = n.getNodeName();
-            if (name != null && name.equals(childName)) {
-                return n.getTextContent();
-            }
-            for (int j = 0; j < nList.getLength(); j++) {
-                Node node = nList.item(j);
-                List<String> columns = Arrays.asList(getAttrValue(node, "vf:Obec"),
-                        getTextContent(node, "obi:kod"), getTextContent(node, "obi:nazev"));
-                for (int k = 0; k < columns.size(); k++) {
-                    stmt.setString(k + 1, columns.get(j));
-                }
-            }
-            stmt.execute();
-            connection.close();
-        }
-        return "";
-    }
-
-    public static void main(String[] args) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException, SQLException {
+    public static void main(String[] args) throws Exception {
         downloadAndUnzip();
+        parseData();
 
+    }
+
+    /**
+     * The method will allow parse data to database
+     *
+     * @throws Exception if something goes wrong
+     */
+    public static void parseData() throws Exception {
         File file = new File(System.getProperty("user.dir") + "/src/main/resource/20211031_OB_573060_UZSZ.xml");
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -91,10 +55,11 @@ public class XMLConsume {
         Node res = (Node) xpath.evaluate("/vf:Data/vf:Obce", xmlDoc, XPathConstants.NODESET);
 
         getTextContent(res, "vf:Obec");
+
     }
 
     /**
-     * The main method to prepare xml file
+     * The method will allow download ZIP file from the URL address and Unzip it
      */
     public static void downloadAndUnzip() {
         FileOutputStream out = null;
@@ -160,5 +125,63 @@ public class XMLConsume {
         return connection;
     }
 
+    /**
+     * The method to extract an attribute value from a Node.
+     *
+     * @param node     the represented Node
+     * @param attrName the name of child element
+     * @return value of Node
+     */
+    public static String getAttrValue(Node node, String attrName) {
+        if (!node.hasAttributes()) {
+            return "";
+        }
 
+        NamedNodeMap nmap = node.getAttributes();
+        if (nmap == null) {
+            return "";
+        }
+
+        Node n = nmap.getNamedItem(attrName);
+        if (n == null) {
+            return "";
+        }
+        return n.getNodeValue();
+    }
+
+    /**
+     * The method will allow us to extract the text content of a named child element
+     *
+     * @param parentNode the represented Node
+     * @param childName  The name of child element
+     * @return text
+     * @throws SQLException if something goes wrong
+     */
+    public static String getTextContent(Node parentNode, String childName) throws SQLException {
+        NodeList nList = parentNode.getChildNodes();
+        Connection connection = connectToDatabase();
+
+        String sql = "insert into obec(kod, nazev) values(?,?)";
+
+        PreparedStatement stmt = connection.prepareStatement(sql);
+
+        for (int i = 0; i < nList.getLength(); i++) {
+            Node n = nList.item(i);
+            String name = n.getNodeName();
+            if (name != null && name.equals(childName)) {
+                return n.getTextContent();
+            }
+            for (int j = 0; j < nList.getLength(); j++) {
+                Node node = nList.item(j);
+                List<String> columns = Arrays.asList(getAttrValue(node, "vf:Obec"),
+                        getTextContent(node, "obi:kod"), getTextContent(node, "obi:nazev"));
+                for (int k = 0; k < columns.size(); k++) {
+                    stmt.setString(k + 1, columns.get(j));
+                }
+            }
+            stmt.execute();
+            connection.close();
+        }
+        return "";
+    }
 }
