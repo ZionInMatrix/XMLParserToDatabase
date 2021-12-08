@@ -7,14 +7,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -119,10 +116,7 @@ public class XMLConsume {
 
         XPath xpath = XPathFactory.newInstance().newXPath();
 
-        NodeList res = (NodeList) xpath.evaluate("/vf:Data/vf:Obce", xmlDoc, XPathConstants.NODESET);
-
-        getTextContent((Node) res, "vf:Obce");
-
+        getTextContent((Node)xpath.evaluate("/vf:Data/vf:Obce", xmlDoc, XPathConstants.NODESET), "vf:Obce");
     }
 
     /**
@@ -173,7 +167,7 @@ public class XMLConsume {
             }
             for (int j = 0; j < nList.getLength(); j++) {
                 Node node = nList.item(j);
-                List<String> columns = Arrays.asList(getAttrValue(node, "vf:Obec"),
+                List<String> columns = Arrays.asList(getAttrValue(node, "vf:Obce"),
                         getTextContent(node, "obi:kod"), getTextContent(node, "obi:nazev"));
                 for (int k = 0; k < columns.size(); k++) {
                     stmt.setString(k + 1, columns.get(j));
