@@ -1,9 +1,8 @@
-package main;
+package consumer;
 
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import org.w3c.dom.Document;
-
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -26,9 +25,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class XMLConsume {
-    static final String url = "https://vdp.cuzk.cz/vymenny_format/soucasna/20211031_OB_573060_UZSZ.xml.zip";
-    static final String pathToDownloadFile = System.getProperty("user.dir") + "/src/main/resources/addressBook.zip";
-    static final String pathToUnzipFile = System.getProperty("user.dir") + "/src/main/resources";
+
+    private static final String url = "https://vdp.cuzk.cz/vymenny_format/soucasna/20211031_OB_573060_UZSZ.xml.zip";
+    private static final String pathToDownloadFile =
+            System.getProperty("user.dir") + "/src/main/resources/addressBook.zip";
+    private static final String pathToUnzipFile = System.getProperty("user.dir") + "/src/main/resources";
 
     public static void main(String[] args) throws Exception {
         downloadAndUnzip();
@@ -116,7 +117,7 @@ public class XMLConsume {
 
         XPath xpath = XPathFactory.newInstance().newXPath();
 
-        getTextContent((Node)xpath.evaluate("/vf:Data/vf:Obce", xmlDoc, XPathConstants.NODESET), "vf:Obce");
+        getTextContent((Node) xpath.evaluate("/vf:Data/vf:Obce", xmlDoc, XPathConstants.NODESET), "vf:Obce");
     }
 
     /**
@@ -132,9 +133,6 @@ public class XMLConsume {
         }
 
         NamedNodeMap nmap = node.getAttributes();
-        if (nmap == null) {
-            return "";
-        }
 
         Node n = nmap.getNamedItem(attrName);
         if (n == null) {
@@ -162,7 +160,7 @@ public class XMLConsume {
         for (int i = 0; i < nList.getLength(); i++) {
             Node n = nList.item(i);
             String name = n.getNodeName();
-            if (name != null && name.equals(childName)) {
+            if (name.equals(childName)) {
                 return n.getTextContent();
             }
             for (int j = 0; j < nList.getLength(); j++) {
