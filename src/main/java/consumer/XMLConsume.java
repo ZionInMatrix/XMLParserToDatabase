@@ -26,15 +26,13 @@ import java.util.List;
 
 public class XMLConsume {
 
-    private static final String url = "https://vdp.cuzk.cz/vymenny_format/soucasna/20211031_OB_573060_UZSZ.xml.zip";
-    private static final String pathToDownloadFile =
-            System.getProperty("user.dir") + "/src/main/resources/addressBook.zip";
-    private static final String pathToUnzipFile = System.getProperty("user.dir") + "/src/main/resources";
+    private static final String URL = "https://vdp.cuzk.cz/vymenny_format/soucasna/20211031_OB_573060_UZSZ.xml.zip";
+    private static final String PATH = System.getProperty("user.dir") + "/src/main/resources/addressBook.zip";
+    private static final String PATH_UNZIP = System.getProperty("user.dir") + "/src/main/resources";
 
     public static void main(String[] args) throws Exception {
         downloadAndUnzip();
         parseData();
-
     }
 
     /**
@@ -46,8 +44,8 @@ public class XMLConsume {
         int count = 0;
 
         try {
-            in = new BufferedInputStream(new URL(url).openStream());
-            out = new FileOutputStream(pathToDownloadFile);
+            in = new BufferedInputStream(new URL(URL).openStream());
+            out = new FileOutputStream(PATH);
             byte[] data = new byte[1024];
 
             while ((count = in.read(data, 0, 1024)) != -1) {
@@ -78,8 +76,8 @@ public class XMLConsume {
      */
     public static void unzipFile() {
         try {
-            ZipFile zipFile = new ZipFile(pathToDownloadFile);
-            zipFile.extractAll(pathToUnzipFile);
+            ZipFile zipFile = new ZipFile(PATH);
+            zipFile.extractAll(PATH_UNZIP);
 
         } catch (ZipException e) {
             e.printStackTrace();
@@ -153,7 +151,7 @@ public class XMLConsume {
         NodeList nList = parentNode.getChildNodes();
         Connection connection = connectToDatabase();
 
-        String sql = "insert into obec(kod, nazev) values(?,?)";
+        String sql = "INSERT INTO obec(kod, nazev) VALUES(?,?)";
 
         PreparedStatement stmt = connection.prepareStatement(sql);
 
